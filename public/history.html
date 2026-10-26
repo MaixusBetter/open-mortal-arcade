@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why This Game Matters · Open Mortal Arcade</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  body { display: grid; grid-template-rows: auto 1fr auto; min-height: 100dvh; }
+  header.bar { display: flex; align-items: center; gap: 14px; padding: 10px 18px; background: rgba(18,13,11,.92); box-shadow: inset 0 -4px 0 var(--brass-lo); flex-wrap: wrap; }
+  header.bar a.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  header.bar .wordmark { font-size: 34px; }
+  header.bar .spacer { flex: 1; }
+  .dots { display: flex; gap: 6px; flex-wrap: wrap; }
+  .dots button { width: 18px; height: 18px; border: 0; padding: 0; cursor: pointer; background: var(--stone-3); box-shadow: var(--bevel-out); }
+  .dots button[aria-current="true"] { background: var(--brass); }
+
+  main.story { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 34px; align-items: center; padding: 28px clamp(16px, 4vw, 56px); max-width: 1500px; margin: 0 auto; width: 100%; }
+  .panel { position: relative; aspect-ratio: 4 / 3; background: #000; box-shadow: 0 0 0 4px var(--stone-0), 0 0 0 8px var(--brass-mid), 0 0 0 12px var(--stone-0); overflow: hidden; display: grid; place-items: center; }
+  .panel img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+  .panel figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; background: rgba(18,13,11,.84); font-size: 14px; color: var(--bone-dim); }
+  .text .kicker { font: 700 18px var(--font-ui); color: var(--ember); margin: 0 0 4px; }
+  .text h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(44px, 5vw, 76px); line-height: .95; margin: 0 0 18px; color: var(--brass-hi); text-shadow: 0 3px 0 var(--brass-lo), 0 6px 0 var(--stone-0); }
+  .text p { font-size: clamp(17px, 1.35vw, 21px); line-height: 1.55; max-width: 60ch; }
+  .text .call { margin-top: 16px; padding: 12px 16px; background: rgba(18,13,11,.86); box-shadow: inset 4px 0 0 var(--brass); font-size: 18px; max-width: 60ch; }
+  .text pre { font: 14px/1.45 ui-monospace, Consolas, monospace; background: var(--stone-0); color: #d8ccb2; padding: 12px; box-shadow: var(--bevel-in); overflow-x: auto; max-width: 62ch; }
+  .text pre .s { color: var(--brass); }
+  .text ol.free { padding-left: 0; list-style: none; display: grid; gap: 8px; counter-reset: f -1; }
+  .text ol.free li { counter-increment: f; display: grid; grid-template-columns: 34px 1fr; gap: 10px; font-size: 18px; line-height: 1.4; }
+  .text ol.free li::before { content: counter(f); display: grid; place-content: center; height: 30px; background: var(--brass); color: var(--stone-0); font-weight: 700; }
+
+  /* the code-entry visual */
+  .pad { display: grid; gap: 22px; justify-items: center; padding: 24px; background: radial-gradient(circle at 50% 30%, #2f2722, #120d0b 70%); width: 100%; height: 100%; align-content: center; }
+  .pad .keys { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .pad .keys b { width: clamp(44px, 5vw, 70px); aspect-ratio: 1; border-radius: 50%; display: grid; place-content: center; font: 700 clamp(22px, 2.6vw, 34px) var(--font-ui); color: var(--stone-0);
+    background: radial-gradient(circle at 35% 30%, var(--brass-hi) 0 18%, var(--brass) 19% 62%, var(--brass-lo) 63%); box-shadow: 0 5px 0 #000; }
+  .pad .keys b.c { background: radial-gradient(circle at 35% 30%, #f06a4f 0 18%, var(--blood) 19% 62%, var(--blood-deep) 63%); color: var(--bone); }
+  .pad .lbl { font: 600 18px var(--font-ui); color: var(--bone-dim); text-align: center; }
+  .bigdate { font-family: var(--font-display); font-size: clamp(70px, 10vw, 150px); color: var(--brass-hi); text-shadow: 0 4px 0 var(--brass-lo), 0 8px 0 #000; line-height: .9; text-align: center; }
+  .ladder { display: grid; gap: 8px; width: min(86%, 440px); }
+  .ladder div { display: grid; grid-template-columns: 74px 1fr; align-items: center; gap: 12px; padding: 8px 10px; background: var(--stone-2); box-shadow: var(--bevel-out); font-size: 17px; }
+  .ladder b { font: 700 22px var(--font-ui); text-align: center; background: var(--bone); color: var(--stone-0); padding: 2px 0; }
+  .ladder small { color: var(--bone-faint); }
+
+  /* EVO chart */
+  .chart { width: 100%; height: 100%; padding: 22px 22px 14px; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; background: #120d0b; }
+  .chart h2 { font-size: 17px; margin: 0; color: var(--bone); }
+  .chart svg { width: 100%; height: 100%; overflow: visible; }
+  .chart .note { font-size: 13px; color: var(--bone-faint); }
+  .tip { position: fixed; pointer-events: none; background: var(--stone-0); color: var(--bone); padding: 6px 10px; font-size: 14px; box-shadow: inset 0 0 0 2px var(--brass); z-index: 20; }
+  table.compare { border-collapse: collapse; width: 100%; font-size: 16px; }
+  table.compare th, table.compare td { text-align: left; padding: 7px 8px; vertical-align: top; border-bottom: 2px solid var(--stone-2); }
+  table.compare th { color: var(--bone-dim); font-weight: 600; }
+  table.compare td:first-child { color: var(--bone-dim); white-space: nowrap; }
+  .sources ol { font-size: 16px; line-height: 1.5; padding-left: 22px; }
+  .sources a { word-break: break-word; }
+
+  footer.nav { display: flex; gap: 10px; justify-content: space-between; align-items: center; padding: 12px 18px; background: rgba(18,13,11,.92); box-shadow: inset 0 4px 0 var(--brass-lo); }
+  footer.nav .where { color: var(--bone-dim); font-size: 15px; }
+  @media (max-width: 960px) {
+    main.story { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="./" aria-label="Back to the title screen"><img src="img/emblem.png" alt="" width="36" height="36"><span class="wordmark"><span>Why this game matters</span></span></a>
+  <span class="spacer"></span>
+  <nav class="dots" id="dots" aria-label="Chapters"></nav>
+  <label class="check small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="auto"> Attract mode</label>
+</header>
+<main class="story" id="story" aria-live="polite"></main>
+<footer class="nav">
+  <button class="slab" id="prev">Previous</button>
+  <span class="where" id="where"></span>
+  <button class="slab brass" id="next">Next</button>
+</footer>
+<div class="tip" id="tip" hidden></div>
+<script type="module">
+import { h, blip } from './js/ui.js';
+
+const SRC = {
+  hearings: ['1993-1994 United States Senate hearings on video games', 'https://en.wikipedia.org/wiki/1993%E2%80%931994_United_States_Senate_hearings_on_video_games'],
+  mk92: ['Mortal Kombat (1992 video game)', 'https://en.wikipedia.org/wiki/Mortal_Kombat_(1992_video_game)'],
+  hof: ['World Video Game Hall of Fame: Mortal Kombat', 'https://www.worldvideogamehalloffame.org/games/mortal-kombat'],
+  guinness: ['Guinness World Records: first videogame to be uncensored by a cheat code', 'https://www.guinnessworldrecords.com/world-records/556446-first-videogame-to-be-uncencored-by-a-cheat-code'],
+  esrb: ['Entertainment Software Rating Board', 'https://en.wikipedia.org/wiki/Entertainment_Software_Rating_Board'],
+  esrb20: ['ESRB: celebrating 20 years of rating video games and apps', 'https://esrb.org/blog/esrb-celebrates-20-years-of-rating-video-games-and-apps'],
+  khsaa: ['"No place for shooter games in our schools": Fortnite banned from Ky. high school esports', 'https://www.fox19.com/2020/01/29/no-place-shooter-games-our-schools-fortnite-banned-ky-high-school-esports'],
+  olympic: ['Olympic Esports Games', 'https://en.wikipedia.org/wiki/Olympic_Esports_Games'],
+  evo: ['EventHubs: Mortal Kombat entrant numbers at Evo over the years', 'https://eventhubs.com/news/2024/jul/05/history-mk-evo-entrant-numbers'],
+  fsd: ['The Free Software Definition', 'https://en.wikipedia.org/wiki/The_Free_Software_Definition'],
+  om: ['OpenMortal project page', 'https://openmortal.sourceforge.net/'],
+  howto: ['OpenMortal Character HOWTO', 'https://openmortal.sourceforge.net/Character_HOWTO.html'],
+  bw: ['Boxedwine', 'https://github.com/danoon2/Boxedwine'],
+};
+const cite = (...keys) => h('p', { class: 'faint small', style: { marginTop: '10px' } }, 'Sources: ', keys.map((k, i) => [i ? ', ' : '', h('a', { href: SRC[k][1], target: '_blank', rel: 'noopener' }, SRC[k][0])]));
+const img = (src, alt, cap) => h('figure', { class: 'panel', style: { margin: 0 } }, h('img', { src, alt }), cap ? h('figcaption', {}, cap) : null);
+
+const EVO = [[2013, 'MK9', 233], [2014, null, 0], [2015, 'MKX', 1162], [2016, 'MKX', 707], [2017, null, 0], [2018, null, 0], [2019, 'MK11', 1567], [2020, null, 0], [2021, 'MK11', 714], [2022, 'MK11', 464], [2023, 'MK11', 449], [2024, 'MK1', 645]];
+
+function evoChart() {
+  const W = 620, H = 300, L = 46, B = 34, T = 16, max = 1600;
+  const bw = (W - L - 10) / EVO.length;
+  const y = v => H - B - (v / max) * (H - B - T);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', 'Bar chart of Mortal Kombat entrants at EVO by year. Peak 1,567 in 2019.');
+  let s = '';
+  for (const g of [0, 400, 800, 1200, 1600]) s += `<line x1="${L}" x2="${W - 6}" y1="${y(g)}" y2="${y(g)}" stroke="#2f2722" stroke-width="1"/><text x="${L - 8}" y="${y(g) + 4}" fill="#857a66" font-size="12" text-anchor="end" font-family="Pixelify Sans">${g.toLocaleString()}</text>`;
+  EVO.forEach(([yr, game, n], i) => {
+    const x = L + i * bw + 3, w = bw - 6;
+    if (n) {
+      const top = y(n), hgt = H - B - top;
+      s += `<path data-i="${i}" d="M${x},${H - B} V${top + 3} q0,-3 3,-3 h${w - 6} q3,0 3,3 V${H - B} Z" fill="${yr === 2021 ? '#b0741e' : '#e3a93a'}"/>`;
+      s += `<rect data-i="${i}" x="${x - 3}" y="${T}" width="${w + 6}" height="${H - B - T}" fill="transparent"/>`;
+      if (yr === 2019 || yr === 2024) s += `<text x="${x + w / 2}" y="${top - 6}" fill="#efe3c8" font-size="13" text-anchor="middle" font-family="Pixelify Sans" font-weight="700">${n.toLocaleString()}</text>`;
+    } else {
+      s += `<text x="${x + w / 2}" y="${H - B - 8}" fill="#857a66" font-size="11" text-anchor="middle" font-family="Pixelify Sans">${yr === 2020 ? 'cancelled' : 'no MK'}</text>`;
+    }
+    s += `<text x="${x + w / 2}" y="${H - B + 16}" fill="#b9ab90" font-size="12" text-anchor="middle" font-family="Pixelify Sans">${String(yr).slice(2)}</text>`;
+    if (game) s += `<text x="${x + w / 2}" y="${H - B + 29}" fill="#857a66" font-size="10" text-anchor="middle" font-family="Pixelify Sans">${game}</text>`;
+  });
+  s += `<line x1="${L}" x2="${W - 6}" y1="${H - B}" y2="${H - B}" stroke="#6e6157" stroke-width="2"/>`;
+  svg.innerHTML = s;
+  const tip = document.getElementById('tip');
+  svg.addEventListener('pointermove', e => {
+    const i = e.target.getAttribute && e.target.getAttribute('data-i');
+    if (i == null) { tip.hidden = true; return; }
+    const [yr, game, n] = EVO[+i];
+    tip.hidden = false; tip.textContent = `EVO ${yr}: ${game}, ${n.toLocaleString()} entrants${yr === 2021 ? ' (online only)' : ''}`;
+    tip.style.left = e.clientX + 14 + 'px'; tip.style.top = e.clientY - 34 + 'px';
+  });
+  svg.addEventListener('pointerleave', () => { tip.hidden = true; });
+  const table = h('table', { class: 'sr-only' }, h('caption', {}, 'Mortal Kombat entrants at EVO'), h('tr', {}, h('th', {}, 'Year'), h('th', {}, 'Game'), h('th', {}, 'Entrants')),
+    EVO.map(([yr, g, n]) => h('tr', {}, h('td', {}, yr), h('td', {}, g || 'no MK event'), h('td', {}, n || '-'))));
+  return h('figure', { class: 'panel', style: { margin: 0 } }, h('div', { class: 'chart' }, h('h2', {}, 'Mortal Kombat entrants at EVO, by year'), svg, h('div', { class: 'note' }, 'Darker bar: 2021 was online only. Gaps: EVO ran without Mortal Kombat; 2020 was cancelled.'), table));
+}
+
+const CHAPTERS = [
+  {
+    kicker: 'August 1992', title: 'Real people, real fists',
+    visual: () => img('img/history/fight.jpg', 'OpenMortal screenshot: two real people filmed and digitized, fighting in front of Budapest', 'OpenMortal (2003) borrowed the trick: friends filmed in front of a green cloth.'),
+    body: () => [
+      h('p', {}, 'Mortal Kombat reached arcades in August 1992. Programmer Ed Boon and artist John Tobias made it for Midway, and instead of drawing cartoon fighters they filmed actors and digitized them. Tobias shot the footage on his own Hi-8 camcorder.'),
+      h('p', {}, 'Photographic fighters made every punch, and every Fatality, look real. That realism is exactly what got Washington\'s attention a year later.'),
+      h('div', { class: 'call' }, 'Tonight you do the same thing Tobias did, with your phone instead of a camcorder.'),
+      cite('mk92', 'hof'),
+    ],
+  },
+  {
+    kicker: 'September 13, 1993', title: 'Mortal Monday',
+    visual: () => h('div', { class: 'panel' }, h('div', { class: 'pad' },
+      h('div', { class: 'lbl' }, 'The Genesis "blood code", entered at the Code of Honor screen'),
+      h('div', { class: 'keys' }, [...'ABACABB'].map(k => h('b', { class: k === 'C' ? 'c' : '' }, k))),
+      h('div', { class: 'lbl' }, 'Guinness lists it as the first game uncensored by a cheat code.'))),
+    body: () => [
+      h('p', {}, 'The home versions launched on one day on Super NES, Genesis, Game Boy and Game Gear. Nintendo had the blood turned into grey "sweat" and the Fatalities toned down. Sega shipped without blood too, but a code brought it all back, and every magazine printed it.'),
+      h('p', {}, 'According to the Senate hearing record, the Genesis version outsold Nintendo\'s about five to one. By July 1994 the console versions had sold more than 6 million copies.'),
+      cite('mk92', 'guinness', 'hearings'),
+    ],
+  },
+  {
+    kicker: 'December 9, 1993', title: 'Congress takes a look',
+    visual: () => h('div', { class: 'panel' }, h('div', { class: 'pad' }, h('div', { class: 'bigdate' }, '12.9.93'), h('div', { class: 'lbl' }, 'First Senate hearing on video game violence'))),
+    body: () => [
+      h('p', {}, 'Senators Joe Lieberman and Herb Kohl led hearings with Mortal Kombat, Night Trap and Lethal Enforcers as exhibits. Sega already had its own label, the Videogame Rating Council (June 1993), but Nintendo would not use a rival\'s system.'),
+      h('p', {}, 'Lieberman introduced the Video Game Rating Act on February 3, 1994. At a second hearing on March 4, 1994, the industry promised an independent rating system, with every new game rated by that November.'),
+      h('div', { class: 'call' }, 'The deal: the industry rates itself, or Congress writes the rules.'),
+      cite('hearings'),
+    ],
+  },
+  {
+    kicker: 'September 1994', title: 'The ESRB is born',
+    visual: () => h('div', { class: 'panel' }, h('div', { class: 'pad' }, h('div', { class: 'ladder' },
+      h('div', {}, h('b', {}, 'EC'), h('span', {}, 'Early Childhood')),
+      h('div', {}, h('b', {}, 'K-A'), h('span', {}, 'Kids to Adults ', h('small', {}, 'became "Everyone" in 1998'))),
+      h('div', {}, h('b', {}, 'T'), h('span', {}, 'Teen')),
+      h('div', {}, h('b', {}, 'M'), h('span', {}, 'Mature ', h('small', {}, 'where modern Mortal Kombat sits'))),
+      h('div', {}, h('b', {}, 'AO'), h('span', {}, 'Adults Only'))),
+      h('div', { class: 'lbl' }, 'The original 1994 age categories. "Everyone 10+" came in 2005.'))),
+    body: () => [
+      h('p', {}, 'Acclaim, Electronic Arts, Nintendo, Sega and others formed the Interactive Digital Software Association in April 1994 (it is the Entertainment Software Association today). It presented the Entertainment Software Rating Board to Congress that July, and the first rating certificates were issued on September 16, 1994.'),
+      h('p', {}, 'A rating has two halves: an age category, and content descriptors that say why. Publishers submit a questionnaire and video of the most intense content, and at least three trained raters agree on the result.'),
+      h('div', { class: 'call' }, 'In 2011 the U.S. Supreme Court ruled that games are protected expression (Brown v. Entertainment Merchants Association). That is why American game ratings stay voluntary and industry-run.'),
+      cite('esrb', 'esrb20', 'hearings'),
+    ],
+  },
+  {
+    kicker: 'Ratings and competition', title: 'Who gets to play, and where',
+    visual: () => img('img/history/select.jpg', 'OpenMortal fighter select screen', 'OpenMortal never received a rating: it was free, and nobody submitted it. What would you give it?'),
+    body: () => [
+      h('p', {}, 'A rating is the shared language organizers use to decide what can be played, by whom, and on whose stage. Schools, sponsors, venues and broadcasters all lean on it.'),
+      h('p', {}, 'In January 2020 the Kentucky High School Athletic Association removed Fortnite from school esports, saying "there is no place for shooter games in our schools." The International Olympic Committee has kept games it calls too violent out of its esports events; its 2023 Olympic Esports Series ran a modified, target-shooting Fortnite and showed Street Fighter as an exhibition.'),
+      h('p', {}, 'Modern Mortal Kombat games are rated M, and the series\' competitive scene grew at open, community-run tournaments like EVO.'),
+      h('div', { class: 'call' }, 'Discussion: which content descriptors fit OpenMortal? Could your school league run it?'),
+      cite('khsaa', 'olympic'),
+    ],
+  },
+  {
+    kicker: 'Mortal Kombat as an esport', title: 'Kombat at EVO',
+    visual: evoChart,
+    body: () => [
+      h('p', {}, 'EVO in Las Vegas is the largest open fighting game tournament. Mortal Kombat\'s biggest turnout there was 1,567 entrants for Mortal Kombat 11 in its first year, 2019. Mortal Kombat 1 drew 645 in its 2024 debut.'),
+      h('p', {}, 'The series has also left the lineup some years, which is normal for fighting games: a game\'s community has to show up and prove it every season.'),
+      cite('evo'),
+    ],
+  },
+  {
+    kicker: 'Free as in freedom', title: 'The joy of open source',
+    visual: () => img('img/history/Credits.jpg', 'OpenMortal credits screen', 'OpenMortal\'s credits thank Midway "for not harrassing us with legal stuff so far."'),
+    body: () => [
+      h('p', {}, 'OpenMortal is free software under the GNU GPL, and so is Boxedwine, the Windows layer running it in your browser tonight. The Free Software Foundation\'s definition comes down to four freedoms, and this event uses all of them:'),
+      h('ol', { class: 'free' },
+        h('li', {}, 'Run it for any purpose: the real 2004 OpenMortal.exe, unmodified, on any computer with a browser.'),
+        h('li', {}, 'Study and change it: its fighters are a readable Perl script plus a sprite file we decoded byte by byte.'),
+        h('li', {}, 'Share copies: anyone here can download the game and this whole arcade.'),
+        h('li', {}, 'Share your changes: your fighter is a modification you can hand to anyone.')),
+      h('pre', { html: "# from OpenMortal's own Kinga.pl: moves are just data\n$Con = {\n'hpunch'  => <span class=\"s\">'HighPunch'</span>,\n'hpunchD' => <span class=\"s\">'Uppercut'</span>,    # Down, High punch\n'lpunchBD'=> <span class=\"s\">'Grenade'</span>,     # Back, Down, Low punch" }),
+      cite('fsd', 'om', 'bw'),
+    ],
+  },
+  {
+    kicker: '2003 versus tonight', title: 'Making a fighter, then and now',
+    visual: () => img('img/history/custom-fight.jpg', 'A fighter made with the Mortal Arcade creator fighting in OpenMortal', 'A fighter built in the browser creator, fighting in the real engine.'),
+    body: () => [
+      h('table', { class: 'compare' },
+        h('tr', {}, h('th', {}, ''), h('th', {}, 'OpenMortal HOWTO, 2003'), h('th', {}, 'Mortal Arcade, tonight')),
+        h('tr', {}, h('td', {}, 'Camera'), h('td', {}, 'MiniDV camcorder, tripod, 1500 W lamp'), h('td', {}, 'Any phone or webcam')),
+        h('tr', {}, h('td', {}, 'Backdrop'), h('td', {}, 'Green cloth on walls and floor'), h('td', {}, 'AI cutout; green screen optional')),
+        h('tr', {}, h('td', {}, 'Cutout'), h('td', {}, 'A neural net trained per fighter, then fixes in GIMP'), h('td', {}, 'In the browser, then brush touch-ups')),
+        h('tr', {}, h('td', {}, 'Frames'), h('td', {}, 'About 1,000 frames cut to about 300 by hand'), h('td', {}, 'Ten poses; the rest is derived')),
+        h('tr', {}, h('td', {}, 'Colours'), h('td', {}, '300 px tall, 63 colours, by hand'), h('td', {}, 'Same rules, automatic')),
+        h('tr', {}, h('td', {}, 'Hit boxes'), h('td', {}, 'Marked by the team in an editor'), h('td', {}, 'Placed from your silhouette')),
+        h('tr', {}, h('td', {}, 'Into the game'), h('td', {}, 'Mailed to the OpenMortal team'), h('td', {}, '"Send to the arcade"'))),
+      cite('howto'),
+    ],
+  },
+  {
+    kicker: 'Read more', title: 'Sources',
+    visual: () => img('img/history/Mortal-en.jpg', 'OpenMortal title screen'),
+    body: () => [h('div', { class: 'sources' }, h('ol', {}, Object.values(SRC).map(([t, u]) => h('li', {}, h('a', { href: u, target: '_blank', rel: 'noopener' }, t)))))],
+  },
+];
+
+let i = 0, timer = 0;
+const story = document.getElementById('story'), dots = document.getElementById('dots');
+CHAPTERS.forEach((c, k) => dots.append(h('button', { 'aria-label': `${k + 1}. ${c.title}`, title: c.title, onclick: () => show(k) })));
+function show(k) {
+  i = (k + CHAPTERS.length) % CHAPTERS.length;
+  const c = CHAPTERS[i];
+  story.innerHTML = '';
+  story.append(c.visual(), h('section', { class: 'text' }, h('p', { class: 'kicker' }, c.kicker), h('h1', {}, c.title), ...c.body()));
+  [...dots.children].forEach((d, n) => d.setAttribute('aria-current', String(n === i)));
+  document.getElementById('where').textContent = `${i + 1} of ${CHAPTERS.length}`;
+  history.replaceState(null, '', `#${i + 1}`);
+}
+document.getElementById('prev').onclick = () => { blip('back'); show(i - 1); };
+document.getElementById('next').onclick = () => { blip('move'); show(i + 1); };
+addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown') show(i + 1); if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(i - 1); });
+document.getElementById('auto').onchange = e => { clearInterval(timer); if (e.target.checked) timer = setInterval(() => show(i + 1), 22000); };
+show(Math.max(0, (parseInt(location.hash.slice(1)) || 1) - 1));
+</script>
+</body>
+</html>

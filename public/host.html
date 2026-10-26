@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Screen · Open Mortal Arcade</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  body { overflow: hidden; height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; }
+  header.marquee {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px;
+    padding: 10px 18px; background: rgba(18,13,11,.92); box-shadow: inset 0 -4px 0 var(--brass-lo);
+  }
+  header .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  header .brand img { width: 44px; height: 44px; }
+  header .wordmark { font-size: 40px; }
+  .join { justify-self: end; display: flex; align-items: center; gap: 16px; text-align: right; }
+  .join .how { font-size: 16px; color: var(--bone-dim); line-height: 1.3; }
+  .join .how b { color: var(--bone); font-size: 19px; }
+  .join .code { font: 700 46px/1 var(--font-ui); letter-spacing: .14em; color: var(--brass-hi); text-shadow: 0 3px 0 var(--brass-lo), 0 5px 0 var(--stone-0); }
+  .join canvas { width: 92px; height: 92px; background: var(--bone); padding: 5px; box-shadow: var(--step-shadow); }
+
+  .floor { display: grid; grid-template-columns: minmax(170px, 1fr) auto minmax(170px, 1fr); gap: 14px; padding: 14px; min-height: 0; }
+  .pillar { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .pillar .tag { font: 700 22px var(--font-ui); padding: 6px 10px; color: var(--stone-0); text-align: center; box-shadow: var(--step-shadow); }
+  .pillar.p1 .tag { background: var(--p1); } .pillar.p2 .tag { background: var(--p2); }
+  .seat { padding: 12px; background: rgba(18,13,11,.86); box-shadow: var(--bevel-in); min-height: 108px; }
+  .seat .who { font: 700 24px/1.1 var(--font-ui); word-break: break-word; }
+  .seat .dev { color: var(--bone-dim); font-size: 15px; margin-top: 4px; }
+  .seat.empty .who { color: var(--bone-faint); font-size: 18px; font-weight: 600; }
+  .lamps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 10px; }
+  .lamps i { height: 10px; background: var(--stone-3); box-shadow: inset 1px 1px 0 var(--stone-0); }
+  .lamps i.on { background: var(--ember); }
+  .queue { font-size: 15px; color: var(--bone-dim); }
+  .queue ul { list-style: none; margin: 4px 0 0; padding: 0; }
+  .queue li { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0; }
+
+  .cabinet { position: relative; height: 100%; aspect-ratio: 4 / 3; max-width: calc(100vw - 2 * 170px - 56px); align-self: center; justify-self: center;
+    background: #000; box-shadow: 0 0 0 4px var(--stone-0), 0 0 0 8px var(--brass-mid), 0 0 0 12px var(--stone-0); }
+  .cabinet iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #000; }
+  .setup { position: absolute; inset: 0; overflow: auto; padding: 22px 26px; background: rgba(18,13,11,.96); }
+  .setup h2 { font-size: 22px; margin-top: 4px; }
+  .setup .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; margin: 8px 0 18px; }
+  .pick { position: relative; appearance: none; border: 0; padding: 0; background: var(--stone-2); cursor: pointer; text-align: center; color: var(--bone); font: 600 13px var(--font-ui); box-shadow: var(--bevel-out); }
+  .pick img { width: 100%; aspect-ratio: 1; display: block; object-fit: cover; background: var(--stone-0); }
+  .pick span { display: block; padding: 4px 3px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pick[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--brass-hi), var(--bevel-out); }
+  .pick[aria-pressed="true"]::after { content: '✓'; position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; display: grid; place-content: center; background: var(--brass); color: var(--stone-0); font-weight: 700; }
+  .pick.stage img { aspect-ratio: 4 / 1; }
+  .pick .order { position: absolute; top: 4px; left: 4px; min-width: 22px; height: 22px; padding: 0 5px; display: grid; place-content: center; background: var(--stone-0); color: var(--brass-hi); font-weight: 700; }
+  .setup .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }
+  .setup .row label.field { min-width: 150px; }
+  .setup .go { margin-top: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .empty-note { color: var(--bone-faint); font-size: 15px; grid-column: 1 / -1; }
+  .boot { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 10px; color: var(--bone); pointer-events: none; }
+
+  footer.deck { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 10px 14px; background: rgba(18,13,11,.92); box-shadow: inset 0 4px 0 var(--brass-lo); }
+  footer.deck .spacer { flex: 1; }
+  footer.deck .hint { color: var(--bone-dim); font-size: 14px; }
+  footer.deck .speed { font: 700 15px var(--font-ui); padding: 3px 8px; background: var(--stone-0); color: var(--p1); }
+  footer.deck .speed.slow { color: var(--ember); }
+  footer.deck .speed.bad { color: var(--blood-hi); }
+</style>
+</head>
+<body>
+<header class="marquee">
+  <a class="brand" href="./" aria-label="Back to the title screen"><img src="img/emblem.png" alt=""><span class="wordmark"><span>Open Mortal Arcade</span></span></a>
+  <div></div>
+  <div class="join" id="join">
+    <div class="how">Join with your phone<br><b id="joinUrl">connecting...</b></div>
+    <div class="code" id="code" aria-label="Room code">----</div>
+    <canvas id="qr" width="92" height="92" aria-label="QR code to join"></canvas>
+  </div>
+</header>
+
+<main class="floor">
+  <section class="pillar p1" aria-label="Player 1">
+    <div class="tag">Player 1</div>
+    <div class="seat empty" id="seat-p1"><div class="who">Open seat</div><div class="dev">Scan the code, or use the keyboard: arrows and J U K I L</div><div class="lamps" id="lamps-p1"><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div class="queue" id="queue"></div>
+  </section>
+
+  <section class="cabinet" id="cabinet" aria-label="Game screen">
+    <div class="setup" id="setup">
+      <h1 class="title">Set up the cabinet</h1>
+      <p class="dim">Pick up to 12 fighters people made, plus any custom stages. The real OpenMortal 0.7 boots with them injected into its data folder.</p>
+      <h2>Custom fighters <span class="faint small" id="fcount"></span></h2>
+      <div class="grid" id="fighters"><p class="empty-note">Loading fighters...</p></div>
+      <h2>Custom stages <span class="faint small">played first, in the order they were sent, before the stock stages</span></h2>
+      <div class="grid" id="stages"><p class="empty-note">Loading stages...</p></div>
+      <h2>Match rules</h2>
+      <div class="row">
+        <label class="field">Round time
+          <select id="gametime"><option value="30">0:30</option><option value="60" selected>1:00</option><option value="90">1:30</option><option value="120">2:00</option></select></label>
+        <label class="field">Stamina
+          <select id="hitpoints"><option value="50">Low</option><option value="100" selected>Normal</option><option value="150">High</option></select></label>
+        <label class="field">Game speed
+          <select id="gamespeed"><option value="16">Slow</option><option value="12" selected>Normal</option><option value="10">Fast</option></select></label>
+        <label class="field">Graphics
+          <select id="graphics"><option value="ddraw" selected>DirectDraw (fastest)</option><option value="gdi">GDI (if the picture stays black)</option></select></label>
+      </div>
+      <h2>Single player</h2>
+      <div class="row">
+        <label class="field">Computer opponent
+          <select id="cpu"><option value="on" selected>Plays when Player 2's seat is empty</option><option value="off">Off, two people only</option></select></label>
+        <label class="field">Computer skill
+          <select id="cpulevel"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
+      </div>
+      <p class="dim small">OpenMortal 0.7 never finished its own single player mode, so the arcade adds a computer opponent to the game's fighter scripts. Choose <b>Multi player game</b> in the game's menu; the computer picks its fighter after you pick yours.</p>
+      <div class="go">
+        <button class="slab blood" id="power">Power on</button>
+        <span class="dim small" id="powerNote">Boots Windows-on-WebAssembly, then OpenMortal. The first boot takes a minute.</span>
+      </div>
+    </div>
+    <div class="boot" id="boot" hidden><div id="bootText">Booting...</div></div>
+  </section>
+
+  <section class="pillar p2" aria-label="Player 2">
+    <div class="tag">Player 2</div>
+    <div class="seat empty" id="seat-p2"><div class="who">Open seat</div><div class="dev">Scan the code, or use the keyboard: W A S D and R F T G X</div><div class="lamps" id="lamps-p2"><i></i><i></i><i></i><i></i><i></i></div></div>
+  </section>
+</main>
+
+<footer class="deck">
+  <button class="slab small" id="btnMenu" title="Opens the game menu (Esc)">Game menu</button>
+  <button class="slab small" id="btnSkip" title="Skips replays and story screens (F1)">Skip scene</button>
+  <button class="slab small" id="btnSetup">Change fighters</button>
+  <button class="slab small" id="btnFull">Full screen</button>
+  <span class="spacer"></span>
+  <span class="speed" id="speed" hidden title="How fast the game runs compared with its normal speed, measured during fights"></span>
+  <span class="hint" id="padHint">Gamepads: plug in and press any button to take a seat.</span>
+</footer>
+<script type="module" src="js/host.js"></script>
+</body>
+</html>

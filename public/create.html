@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make a Fighter · Open Mortal Arcade</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/creator.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="Back to the title screen"><img src="img/emblem.png" alt="" width="40" height="40"><span class="wordmark"><span>Make a fighter</span></span></a>
+  <div class="seg" role="group" aria-label="Mode">
+    <button id="modeEasy" aria-pressed="true" title="Ten poses, everything else is automatic">Easy</button>
+    <button id="modePro" aria-pressed="false" title="Every animation, hitbox and line of the fighter script, with lessons">Hands-on</button>
+  </div>
+  <div class="actions">
+    <button class="slab small" id="btnSample">Try sample footage</button>
+    <label class="slab small" for="openFile">Open project<input type="file" id="openFile" accept=".mafighter,.zip" hidden></label>
+    <button class="slab small" id="btnSave">Save project</button>
+  </div>
+</header>
+
+<nav class="steps" id="steps" aria-label="Steps">
+  <button data-step="footage" aria-current="step"><b>1</b> Footage</button>
+  <button data-step="cutout"><b>2</b> Cut out</button>
+  <button data-step="paint"><b>3</b> Paint</button>
+  <button data-step="profile"><b>4</b> Profile</button>
+  <button data-step="test"><b>5</b> Test &amp; send</button>
+</nav>
+
+<main class="studio" id="studio">
+  <aside class="moves" id="moves" aria-label="Moves"></aside>
+  <section class="work">
+    <div class="viewport" id="viewport"></div>
+    <div class="film" id="film" aria-label="Frames"></div>
+  </section>
+  <aside class="panel" id="panel">
+    <div class="tabs" id="tabs" hidden>
+      <button data-tab="lesson" aria-pressed="true">Lesson</button>
+      <button data-tab="tools" aria-pressed="false">Tools</button>
+      <button data-tab="code" aria-pressed="false">Code</button>
+    </div>
+    <div class="tabbody" id="tab-lesson" hidden></div>
+    <div class="tabbody" id="tab-tools"></div>
+    <div class="tabbody" id="tab-code" hidden></div>
+  </aside>
+</main>
+<div class="busy" id="busy" hidden><div><div id="busyText">Working...</div><progress id="busyBar" max="1" value="0"></progress></div></div>
+<script type="module" src="js/creator/app.js"></script>
+</body>
+</html>

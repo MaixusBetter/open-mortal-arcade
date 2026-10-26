@@ -1,0 +1,15 @@
+{
+  "name": "mortal-arcade",
+  "private": true,
+  "type": "module",
+  "description": "OpenMortal 0.7 in the browser through Boxedwine, with a fighter creator, stage builder and phone controllers",
+  "license": "GPL-2.0-or-later",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node tools/setup.mjs",
+    "start:http": "node tools/setup.mjs --http-only",
+    "server": "node server/server.mjs"
+  }
+}

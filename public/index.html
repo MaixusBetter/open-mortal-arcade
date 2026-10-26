@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Mortal Arcade</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  body { display: grid; min-height: 100dvh; }
+  .hall {
+    display: grid; grid-template-columns: 1fr minmax(320px, 620px) 1fr; align-items: end;
+    gap: 16px; padding: 20px 24px 0; max-width: 1400px; margin: 0 auto; width: 100%;
+  }
+  .side { position: fixed; bottom: 0; z-index: 0; pointer-events: none; }
+  .side:first-child { left: max(2vw, calc(50% - 640px)); } .side:nth-child(3) { right: max(2vw, calc(50% - 640px)); }
+  .center { position: relative; z-index: 1; grid-column: 2; }
+  .side canvas { display: block; height: min(58vh, 470px); width: auto; filter: drop-shadow(0 6px 0 rgba(0,0,0,.6)); }
+  .floor { grid-column: 1 / -1; height: 18px; background: linear-gradient(180deg, var(--stone-0), transparent); margin-top: -8px; }
+  .center { text-align: center; align-self: center; padding-bottom: 24px; }
+  .emblem { width: 96px; height: 96px; display: block; margin: 0 auto 6px; }
+  .wordmark { font-size: clamp(60px, 9vw, 112px); }
+  .tagline { color: var(--bone); font-size: 18px; margin: 14px auto 22px; max-width: 36ch; }
+  nav.menu { display: grid; gap: 10px; text-align: left; max-width: 460px; margin: 0 auto; }
+  nav.menu a {
+    display: grid; grid-template-columns: 22px 1fr; column-gap: 10px; align-items: baseline;
+    padding: 9px 16px 10px; background: var(--stone-2); box-shadow: var(--bevel-out), var(--step-shadow);
+    text-decoration: none; color: var(--bone);
+  }
+  nav.menu a::before { content: ''; width: 14px; height: 14px; grid-row: 1 / span 2; align-self: center;
+    background: conic-gradient(from 45deg, transparent 0 25%, var(--brass) 0 50%, transparent 0) no-repeat; opacity: 0; }
+  nav.menu a:hover, nav.menu a:focus-visible { background: var(--stone-3); outline: none; }
+  nav.menu a:hover::before, nav.menu a:focus-visible::before { opacity: 1; background: var(--brass); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+  nav.menu b { font-size: 21px; font-weight: 700; text-shadow: 0 2px 0 var(--stone-0); }
+  nav.menu span { grid-column: 2; color: var(--bone-dim); font-size: 15px; }
+  nav.menu a.primary { background: var(--blood); box-shadow: inset 2px 2px 0 var(--blood-hi), inset -2px -2px 0 var(--blood-deep), var(--step-shadow); }
+  nav.menu a.primary:hover, nav.menu a.primary:focus-visible { background: #b9170f; }
+  nav.menu a.primary span { color: #f4c9b8; }
+  .status { margin: 14px auto 0; font-size: 14px; color: var(--ember); max-width: 46ch; min-height: 1.5em; }
+  footer { text-align: center; padding: 18px 16px 24px; color: var(--bone-faint); font-size: 14px; background: rgba(18,13,11,.8); }
+  footer p { margin: 0 auto; max-width: 90ch; }
+  @media (max-width: 1100px) {
+    .hall { grid-template-columns: 1fr; padding-top: 24px; }
+    .center { grid-column: 1; }
+    .side { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="hall">
+  <div class="side"><canvas id="left" aria-hidden="true"></canvas></div>
+  <div class="center">
+    <img class="emblem" src="img/emblem-160.png" alt="" width="96" height="96">
+    <h1 class="wordmark"><span>Open Mortal</span><span>Arcade</span></h1>
+    <p class="tagline">The real 2004 OpenMortal, running in your browser. Put yourself in the game, then settle it on the big screen.</p>
+    <nav class="menu" id="menu" aria-label="Main menu">
+      <a class="primary" href="host.html"><b>Start the big screen</b><span>Runs the game on this computer. Players join with their phones.</span></a>
+      <a href="pad.html"><b>Join a fight</b><span>Use your phone, laptop or gamepad as a controller.</span></a>
+      <a href="create.html"><b>Make a fighter</b><span>Film your moves, cut out the background, paint your special.</span></a>
+      <a href="stage.html"><b>Build a stage</b><span>Paint or photograph a place to fight.</span></a>
+      <a href="history.html"><b>Why this game matters</b><span>Mortal Kombat, the ESRB, esports, and the joy of open source.</span></a>
+    </nav>
+    <p class="status" id="status" role="status"></p>
+  </div>
+  <div class="side"><canvas id="right" aria-hidden="true"></canvas></div>
+  <div class="floor"></div>
+</main>
+<footer>
+  <p>OpenMortal 0.7 by UPi and the OpenMortal team (GPL), running unmodified inside Boxedwine, the open-source Windows layer compiled to WebAssembly. Made for the uOttawa Game Development Club.</p>
+</footer>
+<script type="module">
+  import { attractSprite, menuNav, blip } from './js/ui.js';
+  attractSprite(document.getElementById('left'), 'Zoli', { scale: null }).catch(() => {});
+  attractSprite(document.getElementById('right'), 'UPi', { scale: null, mirror: true }).catch(() => {});
+  const menu = document.getElementById('menu');
+  menuNav(menu);
+  menu.addEventListener('click', () => blip('ok'));
+  fetch('api/info').then(r => r.json()).then(info => {
+    const s = document.getElementById('status');
+    if (!info.game) s.textContent = 'The game files are missing on the server: run node tools/build-game-zip.mjs.';
+    else if (!info.runtime) s.textContent = 'The Boxedwine runtime is missing on the server: see README, step 2.';
+    else if (!info.filesystem) s.textContent = 'The Boxedwine Windows file system is missing: put TinyCore15Wine11.0-web.zip in public/game/.';
+  }).catch(() => {
+    document.getElementById('status').textContent = 'Open this page through the Mortal Arcade server (node server/server.mjs) to play.';
+  });
+</script>
+</body>
+</html>

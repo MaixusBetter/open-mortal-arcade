@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build a Stage · Open Mortal Arcade</title>
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/creator.css">
+<style>
+  .studio.stage { grid-template-columns: minmax(0, 1fr) 340px; }
+  .stagework { display: grid; grid-template-rows: auto auto; align-content: start; gap: 14px; padding: 14px; overflow: auto; min-height: 0; justify-items: center; }
+  .game { position: relative; width: min(100%, 860px); aspect-ratio: 4 / 3; background: #000; box-shadow: 0 0 0 3px var(--stone-0), 0 0 0 6px var(--brass-mid); }
+  .game canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; image-rendering: pixelated; }
+  .strip { width: min(100%, 860px); }
+  .strip canvas { width: 100%; display: block; cursor: grab; image-rendering: pixelated; box-shadow: 0 0 0 2px var(--stone-0); }
+  .layers { display: grid; gap: 6px; }
+  .layer { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; padding: 8px; background: var(--stone-2); box-shadow: var(--bevel-out); cursor: pointer; }
+  .layer[aria-current="true"] { box-shadow: inset 0 0 0 2px var(--brass), var(--bevel-out); }
+  .layer small { color: var(--bone-faint); display: block; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="Back to the title screen"><img src="img/emblem.png" alt="" width="40" height="40"><span class="wordmark"><span>Build a stage</span></span></a>
+  <div class="seg" role="group" aria-label="Stage type">
+    <button id="modePhoto" aria-pressed="true" title="One wide picture, the easy way">Photo stage</button>
+    <button id="modeLayers" aria-pressed="false" title="Parallax layers that scroll at different speeds">Layered stage</button>
+  </div>
+  <div class="actions">
+    <button class="slab small blood" id="send">Send to the arcade</button>
+    <button class="slab small" id="dl">Download stage pack</button>
+  </div>
+</header>
+<nav class="steps" aria-hidden="true" style="padding:0;min-height:0"></nav>
+<main class="studio stage">
+  <section class="stagework">
+    <div class="game"><canvas id="game" width="640" height="480" aria-label="Game view: paint here"></canvas></div>
+    <div class="strip"><canvas id="strip" width="960" height="240" aria-label="The whole 1920 pixel wide stage; drag to move the camera"></canvas>
+      <p class="small dim" style="margin-top:6px">The game camera follows the fighters across a 1920 x 480 stage. Drag the strip to look around; paint in the big view.</p></div>
+  </section>
+  <aside class="panel" id="panel"></aside>
+</main>
+<script type="module" src="js/stage.js"></script>
+</body>
+</html>

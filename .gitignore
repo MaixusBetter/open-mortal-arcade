@@ -1,0 +1,25 @@
+# fetched or made on each machine by the launcher
+.runtime/
+data/cert/
+public/game/TinyCore15Wine11.0*.zip
+public/game/*.part
+# runtime probe build output
+public/game/probe-root.zip
+public/game/*.broken
+
+# fighters and stages people send to the arcade: photos and videos of club members stay on
+# the arcade PC (the server makes these folders when it starts)
+data/fighters/
+data/stages/
+
+# never commit Windows installation media or other big downloads
+*.iso
+*.7z
+*.7z.*
+*_iso_7z*
+OpenMortal-*.exe
+openmortal-*.exe
+
+node_modules/
+.DS_Store
+Thumbs.db

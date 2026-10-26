@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenMortal on Boxedwine</title>
+<link href="boxedwine.css" rel="stylesheet">
+<style>
+  /* Mortal Arcade skin for the Boxedwine shell: only the game shows. The shell's two canvas
+     layers stay stacked as in boxedwine.css: #canvas takes input, the frame canvas on top
+     (pointer-events: none) shows the picture. */
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #controls, #console, hr, .modalDialog { display: none !important; }
+  #dropzone { padding: 0 !important; }
+  div.emscripten_border { border: 0 !important; }
+  canvas.emscripten { image-rendering: pixelated; image-rendering: crisp-edges; }
+  #canvas { outline: none; }
+  #loading { position: fixed; inset: 0; display: grid; place-content: center; gap: 12px; text-align: center; color: #efe3c8; font: 600 18px 'Pixelify Sans', system-ui, sans-serif; background: #120d0b; z-index: 5; }
+  #loading progress { width: min(420px, 70vw); height: 14px; accent-color: #e3a93a; }
+  #spinner { display: none; }
+</style>
+</head>
+<body>
+<div id="loading"><figure id="spinner"><div class="spinner"></div></figure><div id="status" class="emscripten">Starting the emulator...</div><div class="emscripten"><progress id="progress" max="100" value="0"></progress></div></div>
+<div id="app">
+  <div id="controls" class="emscripten">
+    <button onclick="start()" id="startbtn" style="display:none">Start</button>
+    <button onclick="buildGetFilesModal()" id="downloadbtn" style="display:none">Get File(s)</button>
+    <button onclick="saveJitModules()" id="savejitbtn" style="display:none">Save JIT Cache</button>
+    <select id="cdromdisc" onchange="insertCDRomDisc(Number(this.value))" style="display:none"></select>
+    <button onclick="ejectCDRomDisc()" id="cdromejectbtn" style="display:none">Eject</button>
+    <a href="#openModal" id="modalLink" style="display:none">Open</a>
+    <a href="#openModalExe" id="modalLinkExe" style="display:none">Open</a>
+    <input id="pointerLock" type="checkbox"> <input id="showConsole" type="checkbox">
+  </div>
+  <div id="dropzone"><div class="emscripten_border">
+    <canvas class="emscripten" id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+    <canvas class="emscripten boxedwine-webgl-canvas" id="boxedwine-webgl-canvas-0" oncontextmenu="event.preventDefault()"></canvas>
+  </div></div>
+  <div id="console"><textarea class="emscripten" id="output" rows="8" style="display:none"></textarea></div>
+  <div id="openModal" class="modalDialog"><div><a href="#close" class="close" onclick="closeGetFilesModal()">X</a><div><input id="selectedItem" readonly> <button onclick="extract()">Get</button></div><div id="tree"></div><div id="overlayRow"><button onclick="saveOverlay()">Save Overlay</button></div><div><h3 id="loadStatus"></h3></div></div></div>
+  <div id="openModalExe" class="modalDialog"><div><a href="#close" id="openModalExeClick" class="close">X</a><div><div id="message"></div><div id="items"></div></div></div></div>
+</div>
+<script>
+  // Bridge used by the big-screen page (same origin): key injection + status.
+  window.arcade = (function () {
+    const KEYS = {
+      ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39, PageDown: 34, Delete: 46, Insert: 45, End: 35, Home: 36,
+      KeyW: 87, KeyS: 83, KeyA: 65, KeyD: 68, KeyX: 88, KeyF: 70, KeyR: 82, KeyG: 71, KeyT: 84,
+      Escape: 27, Enter: 13, F1: 112, Space: 32, Backspace: 8,
+    };
+    const KEYNAME = { ArrowUp: 'ArrowUp', ArrowDown: 'ArrowDown', ArrowLeft: 'ArrowLeft', ArrowRight: 'ArrowRight', PageDown: 'PageDown', Delete: 'Delete', Insert: 'Insert', End: 'End', Home: 'Home', Escape: 'Escape', Enter: 'Enter', F1: 'F1', Space: ' ', Backspace: 'Backspace' };
+    const held = new Set();
+    function key(code, down) {
+      if (!(code in KEYS)) return;
+      if (down && held.has(code)) return;           // no auto-repeat from the bridge
+      if (down) held.add(code); else held.delete(code);
+      const keyCode = KEYS[code];
+      const k = KEYNAME[code] || code.replace(/^Key/, '').toLowerCase();
+      const ev = new KeyboardEvent(down ? 'keydown' : 'keyup', { code, key: k, keyCode, which: keyCode, bubbles: true, cancelable: true });
+      (document.getElementById('canvas') || window).dispatchEvent(ev);
+    }
+    function releaseAll() { for (const c of [...held]) key(c, false); }
+    // A real keyboard on the big-screen PC goes through the host page's mapping too (so the
+    // extra J U K I L layout works while the game has focus); keys it doesn't map pass through.
+    for (const type of ['keydown', 'keyup']) {
+      window.addEventListener(type, e => {
+        if (!e.isTrusted) return;
+        let handled = false;
+        try { handled = parent !== window && typeof parent.arcadeHostKey === 'function' && parent.arcadeHostKey(e.code, type === 'keydown', e.repeat); } catch (err) {}
+        if (handled) { e.preventDefault(); e.stopImmediatePropagation(); }
+      }, true);
+    }
+    // Status files shared with the game's Perl side (data/characters/zzArcade.pl). Everything
+    // the emulated Windows writes lands in the emulator's in-memory file system under ROOT.
+    const ARCADE_DIR = '/home/username/.wine/drive_c/OpenMortal/arcade/';
+    const arcadePath = name => (typeof ROOT === 'string' ? ROOT : '/root') + ARCADE_DIR + name;
+    function readState() {
+      try {
+        const text = FS.readFile(arcadePath('state.txt'), { encoding: 'utf8' });
+        const out = {};
+        for (const m of text.matchAll(/(\w+)=([\w.-]+)/g)) out[m[1]] = /^-?\d+$/.test(m[2]) ? +m[2] : m[2];
+        return out;
+      } catch (e) { return null; }
+    }
+    // only once the game has made control.txt itself, so the emulator already knows the file
+    function writeControl(text) {
+      try {
+        if (!FS.analyzePath(arcadePath('control.txt')).exists) return false;
+        FS.writeFile(arcadePath('control.txt'), text);
+        return true;
+      } catch (e) { return false; }
+    }
+    // Sound. The web build keeps the guest's sound off until the first mouse click on the game
+    // (and the browser keeps audio paused until someone interacts). Players here use keys,
+    // phones and gamepads, so the arcade clicks the top-left corner of the game itself: once
+    // when the emulator starts, and again from the big screen's own clicks and key presses,
+    // which count as interaction for this frame too.
+    let nudges = 0;
+    function nudgeAudio() {
+      if (nudges >= 6) return;
+      const c = document.getElementById('canvas');
+      const r = c && c.getBoundingClientRect();
+      if (!r || !r.width) return;
+      nudges++;
+      const opts = { bubbles: true, cancelable: true, button: 0, buttons: 1, clientX: r.left + 1, clientY: r.top + 1 };
+      c.dispatchEvent(new MouseEvent('mousedown', opts));
+      c.dispatchEvent(new MouseEvent('mouseup', { ...opts, buttons: 0 }));
+    }
+    return { key, releaseAll, held, readState, writeControl, nudgeAudio };
+  })();
+  // forward shell status text to the parent page; the shell clears the text once the
+  // emulator is running, which is when the loading cover comes off the canvas. After that the
+  // game owns the screen: a later status line (the shell shows "Exception thrown" for any
+  // script error on the page, even a harmless one) goes to the console, never over the game.
+  (function () {
+    const st = document.getElementById('status');
+    const cover = document.getElementById('loading');
+    let started = false, lastText = null;
+    new MutationObserver(() => {
+      const text = st.textContent.trim();
+      if (started) { if (text && text !== lastText) console.warn('[arcade] emulator status:', text); lastText = text; return; }
+      if (!text) {
+        started = true;
+        cover.style.display = 'none'; document.getElementById('canvas').focus();
+        setTimeout(() => window.arcade.nudgeAudio(), 500);
+      }
+      try { parent.postMessage({ arcade: 'status', text, running: !text }, location.origin); } catch (e) {}
+    }).observe(st, { childList: true, characterData: true, subtree: true });
+  })();
+</script>
+<script src="fsfs.js"></script>
+<script src="boxedwine-shell.js"></script>
+<script src="boxedwine.js" async></script>
+</body>
+</html>

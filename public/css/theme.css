@@ -1,0 +1,161 @@
+/* Mortal Arcade - shared 16-bit "carved stone and cast brass" theme.
+   Rules: crisp pixels (no blur, no soft shadows), bevels are hard 2px steps,
+   the gold blackletter wordmark is the one loud thing on any screen. */
+
+@font-face { font-family: 'Jacquard 24'; src: url('../fonts/jacquard-24-latin-400-normal.woff2') format('woff2'); font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Jacquard 24'; src: url('../fonts/jacquard-24-latin-ext-400-normal.woff2') format('woff2'); font-display: swap; unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Pixelify Sans'; src: url('../fonts/pixelify-sans-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Pixelify Sans'; src: url('../fonts/pixelify-sans-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Pixelify Sans'; src: url('../fonts/pixelify-sans-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Pixelify Sans'; src: url('../fonts/pixelify-sans-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+
+:root {
+  /* stone */
+  --stone-0: #120d0b;
+  --stone-1: #1c1613;
+  --stone-2: #2f2722;
+  --stone-3: #4a3f37;
+  --stone-4: #6e6157;
+  /* blood + fire */
+  --blood: #a3120f;
+  --blood-deep: #6a0c0a;
+  --blood-hi: #e0301e;
+  --ember: #ff8a1f;
+  /* cast brass */
+  --brass-hi: #ffe08a;
+  --brass: #e3a93a;
+  --brass-mid: #b0741e;
+  --brass-lo: #7a4d10;
+  /* text */
+  --bone: #efe3c8;
+  --bone-dim: #b9ab90;
+  --bone-faint: #857a66;
+  /* the real game's select-screen cursor colours */
+  --p1: #3ee05a;
+  --p2: #ff4fd8;
+
+  --font-display: 'Jacquard 24', 'UnifrakturCook', serif;
+  --font-ui: 'Pixelify Sans', system-ui, sans-serif;
+  --px: 3px;               /* one "art pixel" at the default scale */
+  --bevel-out: inset 2px 2px 0 var(--stone-4), inset -2px -2px 0 var(--stone-0);
+  --bevel-in: inset 2px 2px 0 var(--stone-0), inset -2px -2px 0 var(--stone-3);
+  --step-shadow: 0 2px 0 var(--stone-0), 0 4px 0 rgba(0,0,0,.55);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--stone-1);
+  background-image: linear-gradient(rgba(14,10,8,.62), rgba(14,10,8,.62)), url('../img/stone.png');
+  background-size: auto, 288px 288px;
+  image-rendering: pixelated;
+  color: var(--bone);
+  font: 400 17px/1.5 var(--font-ui);
+  -webkit-font-smoothing: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0;
+}
+img, canvas { image-rendering: pixelated; }
+a { color: var(--brass-hi); }
+a:hover { color: var(--bone); }
+
+/* ---------- type ---------- */
+.wordmark { font-family: var(--font-display); font-weight: 400; line-height: .9; letter-spacing: .01em; margin: 0; }
+/* each line gets its own cast-brass gradient: wrap lines in <span> */
+.wordmark > span {
+  display: block;
+  color: var(--brass);
+  background: linear-gradient(180deg, var(--brass-hi) 0 38%, var(--brass) 38% 58%, var(--brass-mid) 58% 76%, var(--brass-lo) 76% 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 0 var(--stone-0)) drop-shadow(0 3px 0 rgba(0,0,0,.6));
+}
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--brass-hi);
+  text-shadow: 0 2px 0 var(--brass-lo), 0 4px 0 var(--stone-0);
+  margin: 0 0 .3em;
+}
+h2, h3 { font-family: var(--font-ui); font-weight: 700; margin: 0 0 .4em; color: var(--bone); }
+h2 { font-size: 24px; } h3 { font-size: 19px; }
+p { margin: 0 0 .8em; max-width: 68ch; }
+.dim { color: var(--bone-dim); }
+.faint { color: var(--bone-faint); }
+.small { font-size: 14px; }
+kbd { font: 600 13px var(--font-ui); background: var(--stone-3); color: var(--bone); padding: 1px 6px; box-shadow: var(--bevel-out); }
+
+/* ---------- carved slabs (buttons) ---------- */
+.slab {
+  appearance: none; border: 0; cursor: pointer;
+  font: 600 18px/1.1 var(--font-ui); color: var(--bone);
+  background: var(--stone-3);
+  padding: 12px 18px 13px;
+  box-shadow: var(--bevel-out), var(--step-shadow);
+  text-shadow: 0 2px 0 var(--stone-0);
+  text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  user-select: none; -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.slab:hover { background: var(--stone-4); }
+.slab:active, .slab[aria-pressed="true"] { box-shadow: var(--bevel-in); transform: translateY(2px); }
+.slab:disabled { opacity: .45; cursor: not-allowed; }
+.slab.blood { background: var(--blood); box-shadow: inset 2px 2px 0 var(--blood-hi), inset -2px -2px 0 var(--blood-deep), var(--step-shadow); }
+.slab.blood:hover { background: #b9170f; }
+.slab.brass { background: var(--brass); color: var(--stone-0); text-shadow: 0 1px 0 var(--brass-hi); box-shadow: inset 2px 2px 0 var(--brass-hi), inset -2px -2px 0 var(--brass-lo), var(--step-shadow); }
+.slab.brass:hover { background: #f0b848; }
+.slab.small { font-size: 15px; padding: 7px 12px 8px; }
+.slab.icon { padding: 8px; min-width: 40px; }
+
+:focus-visible { outline: 3px solid var(--brass-hi); outline-offset: 3px; }
+.slab:focus-visible { outline: 3px solid var(--brass-hi); outline-offset: 2px; }
+
+/* ---------- recessed panels ---------- */
+.well {
+  background: rgba(18, 13, 11, .86);
+  box-shadow: var(--bevel-in);
+  padding: 16px;
+}
+.plate {
+  background: var(--stone-2);
+  box-shadow: var(--bevel-out), var(--step-shadow);
+  padding: 16px;
+}
+.brass-rule { height: 4px; background: linear-gradient(180deg, var(--brass-hi) 0 25%, var(--brass) 25% 50%, var(--brass-lo) 50% 100%); border: 0; margin: 16px 0; }
+
+/* ---------- form controls ---------- */
+label.field { display: grid; gap: 4px; font-weight: 600; font-size: 15px; color: var(--bone-dim); }
+input[type="text"], input[type="number"], input[type="search"], textarea, select {
+  font: 500 17px var(--font-ui); color: var(--bone);
+  background: var(--stone-0); border: 0; box-shadow: var(--bevel-in);
+  padding: 9px 11px; width: 100%; border-radius: 0;
+}
+textarea { resize: vertical; min-height: 90px; line-height: 1.4; }
+input[type="range"] { accent-color: var(--brass); width: 100%; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--brass); width: 18px; height: 18px; }
+
+/* segmented choice (e.g. Easy / Hands-on) */
+.seg { display: inline-flex; box-shadow: var(--bevel-in); background: var(--stone-0); padding: 3px; gap: 3px; }
+.seg button { appearance: none; border: 0; cursor: pointer; font: 600 15px var(--font-ui); color: var(--bone-dim); background: transparent; padding: 7px 14px; }
+.seg button[aria-pressed="true"] { background: var(--stone-3); color: var(--bone); box-shadow: var(--bevel-out); }
+
+/* player chips */
+.chip-p1, .chip-p2 { font: 700 14px var(--font-ui); padding: 2px 8px; color: var(--stone-0); }
+.chip-p1 { background: var(--p1); } .chip-p2 { background: var(--p2); }
+
+/* toast */
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 50; background: var(--stone-0); color: var(--bone); padding: 10px 16px; box-shadow: inset 0 0 0 2px var(--brass), var(--step-shadow); font-weight: 600; max-width: min(560px, calc(100vw - 32px)); }
+.toast.error { box-shadow: inset 0 0 0 2px var(--blood-hi), var(--step-shadow); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

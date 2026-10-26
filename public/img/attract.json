@@ -1,0 +1,30 @@
+{
+ "UPi": {
+  "w": 212,
+  "h": 307,
+  "frames": 5,
+  "anchorX": 71,
+  "feetY": 302
+ },
+ "Zoli": {
+  "w": 124,
+  "h": 305,
+  "frames": 4,
+  "anchorX": 63,
+  "feetY": 305
+ },
+ "Kinga": {
+  "w": 137,
+  "h": 300,
+  "frames": 5,
+  "anchorX": 79,
+  "feetY": 302
+ },
+ "Grizli": {
+  "w": 133,
+  "h": 316,
+  "frames": 6,
+  "anchorX": 60,
+  "feetY": 317
+ }
+}

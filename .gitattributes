@@ -1,0 +1,24 @@
+# Windows launchers must keep CRLF line endings, so they are stored exactly as they are
+*.cmd -text
+*.ps1 -text
+# shell scripts must keep LF, even when checked out on Windows
+*.sh text eol=lf
+*.command text eol=lf
+# everything else that is text: normalized to LF in the repository
+*.js text
+*.mjs text
+*.html text
+*.css text
+*.md text
+*.json text
+*.pl text
+*.c text
+# binaries
+*.zip binary
+*.wasm binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.webm binary
+*.woff2 binary
+*.tflite binary
